@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
@@ -36,6 +37,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -170,10 +172,20 @@ fun app(vm: GameViewModel) {
 
     var dropdownExpanded by remember { mutableStateOf(false) }
 
-    Column {
-        Text("Basketball Game Viewer")
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Text(
+            text = "Basketball Game Viewer",
+            style = MaterialTheme.typography.headlineSmall
+        )
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Spacer(Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
             Box(
                 modifier = Modifier
@@ -194,6 +206,7 @@ fun app(vm: GameViewModel) {
                     value = selectedDate.format(dateFormatter),
                     onValueChange = {},
                     enabled = false,
+                    label = {Text("Date")},
                     modifier = Modifier.fillMaxWidth(),
                     trailingIcon = {
                         Icon(Icons.Default.DateRange, "Select date")
@@ -201,12 +214,20 @@ fun app(vm: GameViewModel) {
                 )
             }
 
-            Spacer(Modifier.width(16.dp))
-
-            Box {
-                Text(
-                    text = selectedGender,
-                    modifier = Modifier.clickable { dropdownExpanded = true }
+            Box (
+                modifier = Modifier.weight(1f)
+            ){
+                OutlinedTextField(
+                    value = selectedGender,
+                    onValueChange = {},
+                    enabled = false,
+                    label = { Text("Gender") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { dropdownExpanded = true },
+                    trailingIcon = {
+                        Icon(Icons.Default.ArrowDropDown, "Select gender")
+                    }
                 )
 
                 DropdownMenu(
