@@ -4,29 +4,47 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import edu.nd.pmcburne.hwapp.one.ui.theme.HWStarterRepoTheme
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,10 +53,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             HWStarterRepoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-//                    Greeting(
-//                        name = "Android",
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
+                    val vm = GameViewModel()
+                    app(vm)
                 }
             }
         }
@@ -139,6 +155,84 @@ fun gameCard(game: Game) {
                     textAlign = TextAlign.Center
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun app(vm: GameViewModel) {
+    val context = LocalContext.current
+    val today = LocalDate.now()
+    val selectedDate by vm.selectedDate.collectAsState()
+    val selectedGender by vm.selectedGender.collectAsState()
+    val games by vm.entries.collectAsState()
+    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+    var dropdownExpanded by remember { mutableStateOf(false) }
+
+    Column {
+        Text("Basketball Game Viewer")
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        android.app.DatePickerDialog(
+                            context,
+                            { _, year, month, day ->
+                                vm.setDate(LocalDate.of(year, month + 1, day))
+                            },
+                            today.year,
+                            today.monthValue - 1,
+                            today.dayOfMonth
+                        ).show()
+                    }
+            ) {
+                OutlinedTextField(
+                    value = selectedDate.format(dateFormatter),
+                    onValueChange = {},
+                    enabled = false,
+                    modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = {
+                        Icon(Icons.Default.DateRange, "Select date")
+                    }
+                )
+            }
+
+            Spacer(Modifier.width(16.dp))
+
+            Box {
+                Text(
+                    text = selectedGender,
+                    modifier = Modifier.clickable { dropdownExpanded = true }
+                )
+
+                DropdownMenu(
+                    expanded = dropdownExpanded,
+                    onDismissRequest = { dropdownExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Men") },
+                        onClick = {
+                            vm.setGender("Men")
+                            dropdownExpanded = false
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text("Women") },
+                        onClick = {
+                            vm.setGender("Women")
+                            dropdownExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+        for (game in games) {
+            gameCard(game)
         }
     }
 }
