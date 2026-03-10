@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -33,9 +34,32 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+//    kotlinOptions {
+//        jvmTarget = "11"
+//    }
+
+    android {
+        compileSdk = 36
+
+        defaultConfig {
+            minSdk = 27
+            targetSdk = 36
+        }
+
+        compileOptions {
+            sourceCompatibility = JavaVersion.VERSION_11
+            targetCompatibility = JavaVersion.VERSION_11
+        }
+
+        // ✅ New Kotlin compiler DSL
+        kotlin {
+            compilerOptions {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+            }
+        }
     }
+
+
     buildFeatures {
         compose = true
     }
@@ -59,4 +83,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.compose.material:material-icons-extended")
+//    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+//    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:2.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
 }

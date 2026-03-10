@@ -1,8 +1,12 @@
 package edu.nd.pmcburne.hwapp.one
 
+import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -57,5 +61,19 @@ class GameViewModel: ViewModel() {
 
     fun setGender(gender: String) {
         _selectedGender.value = gender
+    }
+
+    fun fetchApiData() {
+        viewModelScope.launch {
+            try {
+                Log.d("app", "starting API")
+                _entries.value = fetchGames(
+                    selectedDate.value,
+                    selectedGender.value)
+                Log.d("app", "received API")
+            } catch (e: Exception) {
+                Log.e("app", "Failed to fetch games", e)
+            }
+        }
     }
 }

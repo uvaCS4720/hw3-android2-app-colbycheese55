@@ -56,6 +56,7 @@ class MainActivity : ComponentActivity() {
             HWStarterRepoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val vm = GameViewModel()
+                    vm.fetchApiData()
                     app(vm)
                 }
             }
@@ -118,9 +119,9 @@ fun gameCard(game: Game) {
             }
 
             else {
-                val timeRemainingFormatted = if (game.gameState != "finished")
+                val timeRemainingFormatted = if (game.gameState != "FINAL")
                     "${game.gameState} - ${game.timeLeft / 60}:${game.timeLeft % 60} left"
-                    else "finished"
+                    else "FINAL"
                 Text(
                     text = timeRemainingFormatted,
                     style = MaterialTheme.typography.bodyMedium,
@@ -145,7 +146,7 @@ fun gameCard(game: Game) {
             }
 
             // Winner Section
-            if (game.gameState == "finished") {
+            if (game.gameState == "FINAL") {
                 val winner = if (game.homeScore > game.awayScore)
                     game.homeName else game.awayName
 
