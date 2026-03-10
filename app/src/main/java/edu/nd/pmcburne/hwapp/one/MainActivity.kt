@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -173,87 +175,90 @@ fun app(vm: GameViewModel) {
 
     var dropdownExpanded by remember { mutableStateOf(false) }
 
-    Column(
+    LazyColumn(
         modifier = Modifier.padding(16.dp)
     ) {
-        Text(
-            text = "Basketball Game Viewer",
-            style = MaterialTheme.typography.headlineSmall
-        )
+        item {
+            Text(
+                text = "Basketball Game Viewer",
+                style = MaterialTheme.typography.headlineSmall
+            )
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable {
-                        android.app.DatePickerDialog(
-                            context,
-                            { _, year, month, day ->
-                                vm.setDate(LocalDate.of(year, month + 1, day))
-                            },
-                            today.year,
-                            today.monthValue - 1,
-                            today.dayOfMonth
-                        ).show()
-                    }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
-                    value = selectedDate.format(dateFormatter),
-                    onValueChange = {},
-                    enabled = false,
-                    label = {Text("Date")},
-                    modifier = Modifier.fillMaxWidth(),
-                    trailingIcon = {
-                        Icon(Icons.Default.DateRange, "Select date")
-                    }
-                )
-            }
 
-            Box (
-                modifier = Modifier.weight(1f)
-            ){
-                OutlinedTextField(
-                    value = selectedGender,
-                    onValueChange = {},
-                    enabled = false,
-                    label = { Text("Gender") },
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { dropdownExpanded = true },
-                    trailingIcon = {
-                        Icon(Icons.Default.ArrowDropDown, "Select gender")
-                    }
-                )
-
-                DropdownMenu(
-                    expanded = dropdownExpanded,
-                    onDismissRequest = { dropdownExpanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Men") },
-                        onClick = {
-                            vm.setGender("Men")
-                            dropdownExpanded = false
+                        .weight(1f)
+                        .clickable {
+                            android.app.DatePickerDialog(
+                                context,
+                                { _, year, month, day ->
+                                    vm.setDate(LocalDate.of(year, month + 1, day))
+                                },
+                                today.year,
+                                today.monthValue - 1,
+                                today.dayOfMonth
+                            ).show()
                         }
-                    )
-
-                    DropdownMenuItem(
-                        text = { Text("Women") },
-                        onClick = {
-                            vm.setGender("Women")
-                            dropdownExpanded = false
+                ) {
+                    OutlinedTextField(
+                        value = selectedDate.format(dateFormatter),
+                        onValueChange = {},
+                        enabled = false,
+                        label = {Text("Date")},
+                        modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = {
+                            Icon(Icons.Default.DateRange, "Select date")
                         }
                     )
                 }
+
+                Box (
+                    modifier = Modifier.weight(1f)
+                ){
+                    OutlinedTextField(
+                        value = selectedGender,
+                        onValueChange = {},
+                        enabled = false,
+                        label = { Text("Gender") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { dropdownExpanded = true },
+                        trailingIcon = {
+                            Icon(Icons.Default.ArrowDropDown, "Select gender")
+                        }
+                    )
+
+                    DropdownMenu(
+                        expanded = dropdownExpanded,
+                        onDismissRequest = { dropdownExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Men") },
+                            onClick = {
+                                vm.setGender("Men")
+                                dropdownExpanded = false
+                            }
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text("Women") },
+                            onClick = {
+                                vm.setGender("Women")
+                                dropdownExpanded = false
+                            }
+                        )
+                    }
+                }
             }
         }
-        for (game in games) {
+
+        items(games) { game ->
             gameCard(game)
         }
     }

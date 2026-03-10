@@ -49,8 +49,8 @@ fun ApiResponse.toGames(): List<Game> {
         Game(
             homeName = g.game.home.names.short,
             awayName = g.game.away.names.short,
-            homeScore = g.game.home.score.toIntOrNull() ?: -1,
-            awayScore = g.game.away.score.toIntOrNull() ?: -1,
+            homeScore = g.game.home.score.toIntOrNull() ?: 0,
+            awayScore = g.game.away.score.toIntOrNull() ?: 0,
             gameState = g.game.currentPeriod,
             startTime = localTime,
             timeLeft = timeLeft
