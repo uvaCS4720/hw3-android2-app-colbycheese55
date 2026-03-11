@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +61,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             HWStarterRepoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val vm = GameViewModel()
+                    val vm = ViewModelProvider(this)[GameViewModel::class.java]
+                    vm.chooseGames(LocalContext.current)
                     app(vm)
                 }
             }
@@ -176,8 +179,6 @@ fun app(vm: GameViewModel) {
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     var dropdownExpanded by remember { mutableStateOf(false) }
 
-    vm.chooseGames(context)
-
 
     PullToRefreshBox(
         isRefreshing = loading,
@@ -239,7 +240,6 @@ fun app(vm: GameViewModel) {
                                 .fillMaxWidth()
                                 .clickable {
                                     dropdownExpanded = true
-                                    vm.chooseGames(context)
                                    },
                             trailingIcon = {
                                 Icon(Icons.Default.ArrowDropDown, "Select gender")
@@ -254,6 +254,7 @@ fun app(vm: GameViewModel) {
                                 text = { Text("Men") },
                                 onClick = {
                                     vm.setGender("Men")
+                                    vm.chooseGames(context)
                                     dropdownExpanded = false
                                 }
                             )
@@ -262,6 +263,7 @@ fun app(vm: GameViewModel) {
                                 text = { Text("Women") },
                                 onClick = {
                                     vm.setGender("Women")
+                                    vm.chooseGames(context)
                                     dropdownExpanded = false
                                 }
                             )

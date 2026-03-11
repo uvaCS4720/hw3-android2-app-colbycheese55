@@ -11,20 +11,20 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
-suspend fun fetchGames(date: LocalDate, gender: String): List<Game> {
-    val client = OkHttpClient().newBuilder()
-        .callTimeout(10, TimeUnit.SECONDS)
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(10, TimeUnit.SECONDS)
-        .build()
+private val client = OkHttpClient().newBuilder()
+    .callTimeout(10, TimeUnit.SECONDS)
+    .connectTimeout(10, TimeUnit.SECONDS)
+    .readTimeout(10, TimeUnit.SECONDS)
+    .writeTimeout(10, TimeUnit.SECONDS)
+    .build()
 
+suspend fun fetchGames(date: LocalDate, gender: String): List<Game> {
     val genderStr = when (gender) {
         "Women" -> "basketball-women"
         "Men" -> "basketball-men"
         else -> "ERROR"
     }
-    val formatter = DateTimeFormatter.ofPattern("yyyy/M/d")
+    val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
     val dateStr = date.format(formatter)
     val url = "https://ncaa-api.henrygd.me/scoreboard/$genderStr/d1/$dateStr"
     Log.d("app", "url: $url")
@@ -33,6 +33,8 @@ suspend fun fetchGames(date: LocalDate, gender: String): List<Game> {
 //    https://ncaa-api.henrygd.me/scoreboard/basketball-men/d1/2026/02/17
 
     val request = Request.Builder()
+        .header("User-Agent", "Android")
+        .header("Accept", "application/json")
         .url(url)
         .build()
 

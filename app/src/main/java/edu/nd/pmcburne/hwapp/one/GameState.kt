@@ -9,5 +9,6 @@ enum class GameState(val value: String) {
     H1("1st Half"),
     H2("2nd Half"),
     DONE("FINAL"),
-    ERROR("ERROR")
+    ERROR("ERROR"),
+    HALFTIME("Halftime")
 }

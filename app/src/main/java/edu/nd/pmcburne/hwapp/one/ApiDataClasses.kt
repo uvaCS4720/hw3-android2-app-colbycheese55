@@ -47,12 +47,13 @@ fun ApiResponse.toGames(gender: String): List<Game> {
                 (timeParts.getOrNull(1)?.toIntOrNull() ?: 0)
 
         val gameState = when(g.game.currentPeriod) {
-            "pre" -> GameState.FUTURE
+            "" -> GameState.FUTURE
             "1st" -> if (gender == "Women") GameState.Q1 else GameState.H1
             "2nd" -> if (gender == "Women") GameState.Q2 else GameState.H2
             "3rd" -> GameState.Q3
             "4th" -> GameState.Q4
             "FINAL" -> GameState.DONE
+            "HALFTIME" -> GameState.HALFTIME
             else -> GameState.ERROR
         }
 

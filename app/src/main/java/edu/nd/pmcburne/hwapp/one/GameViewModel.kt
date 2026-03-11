@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -64,25 +65,22 @@ class GameViewModel: ViewModel() {
 
         viewModelScope.launch {
 
-            // --- 1️⃣ Fetch cached DB immediately ---
+            // 1️⃣ Observe DB
             launch {
-                try {
-                    val cached = dao.getGames(date, gender).first() // suspend
-                    _entries.value = cached.map { it.toGame() }
-                } catch (e: Exception) {
-                    Log.e("app", "Failed to fetch from DB", e)
-                }
+                dao.getGames(date, gender)
+                    .map { list -> list.map { it.toGame() } }
+                    .distinctUntilChanged()
+                    .collect {
+                        _entries.value = it
+                    }
             }
 
-            // --- 2️⃣ Fetch API in background ---
+            // 2️⃣ Fetch API and update DB
             launch {
                 _loading.value = true
                 try {
-                    val apiGames = fetchGames(date, gender) // suspend API call
-                    // update DB
+                    val apiGames = fetchGames(date, gender)
                     dao.updateGames(apiGames.map { it.toEntity(date, gender) })
-                    // update entries
-                    _entries.value = apiGames
                 } catch (e: Exception) {
                     Log.e("app", "Failed to fetch from API", e)
                 } finally {
