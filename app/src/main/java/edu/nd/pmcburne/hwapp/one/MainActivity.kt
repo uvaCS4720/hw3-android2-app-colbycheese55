@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -46,6 +47,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -113,7 +115,7 @@ fun gameCard(game: Game) {
             // Game Status Section
 
             if (game.gameState == GameState.FUTURE) {
-                val formatter = DateTimeFormatter.ofPattern("HH:mm")
+                val formatter = DateTimeFormatter.ofPattern("h:mm a")
                 val formattedTime = game.startTime.format(formatter)
 
                 Text(
@@ -275,54 +277,28 @@ fun app(vm: GameViewModel) {
             items(games) { game ->
                 gameCard(game)
             }
+
+            if (games.isEmpty()) {
+                item {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant
+                    ) {
+                        Text(
+                            text = "No games 😭",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun prev1_gameCard() {
-//    val game = Game(
-//        homeName = "homies",
-//        awayName = "awayies",
-//        homeScore = 10,
-//        awayScore = 15,
-//        gameState = "4th quarter",
-//        startTime = LocalTime.now(),
-//        timeLeft = 100,
-//    )
-//
-//    gameCard(game)
-//}
-
-//@Preview
-//@Composable
-//fun prev2_gameCard() {
-//    val game = Game(
-//        homeName = "homies",
-//        awayName = "awayies",
-//        homeScore = 0,
-//        awayScore = 0,
-//        gameState = "future",
-//        startTime = LocalTime.now(),
-//        timeLeft = 100,
-//    )
-//
-//    gameCard(game)
-//}
-//
-//@Preview
-//@Composable
-//fun prev3_gameCard() {
-//    val game = Game(
-//        homeName = "homies",
-//        awayName = "awayies",
-//        homeScore = 10,
-//        awayScore = 15,
-//        gameState = "finished",
-//        startTime = LocalTime.now(),
-//        timeLeft = 100,
-//    )
-//
-//    gameCard(game)
-//}
