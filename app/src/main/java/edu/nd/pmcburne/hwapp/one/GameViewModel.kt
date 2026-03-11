@@ -19,38 +19,12 @@ class GameViewModel: ViewModel() {
     private val _selectedGender = MutableStateFlow("Men")
     val selectedGender: StateFlow<String> = _selectedGender
 
+    private val _loading = MutableStateFlow(false)
+
+    val loading: StateFlow<Boolean> = _loading
+
     // 3️⃣ Combined filtered entries
-    private val _entries = MutableStateFlow(
-        listOf(
-            Game(
-                homeName = "homies",
-                awayName = "awayies",
-                homeScore = 10,
-                awayScore = 15,
-                gameState = "4th quarter",
-                startTime = LocalTime.now(),
-                timeLeft = 100
-            ),
-            Game(
-                homeName = "homies",
-                awayName = "awayies",
-                homeScore = 0,
-                awayScore = 0,
-                gameState = "future",
-                startTime = LocalTime.now(),
-                timeLeft = 100
-            ),
-            Game(
-                homeName = "homies",
-                awayName = "awayies",
-                homeScore = 10,
-                awayScore = 15,
-                gameState = "finished",
-                startTime = LocalTime.now(),
-                timeLeft = 100
-            )
-        )
-    )
+    private val _entries = MutableStateFlow<List<Game>>(emptyList())
 
     val entries: StateFlow<List<Game>> = _entries
 
@@ -65,6 +39,7 @@ class GameViewModel: ViewModel() {
 
     fun fetchApiData() {
         viewModelScope.launch {
+            _loading.value = true
             try {
                 Log.d("app", "starting API")
                 _entries.value = fetchGames(
@@ -74,6 +49,7 @@ class GameViewModel: ViewModel() {
             } catch (e: Exception) {
                 Log.e("app", "Failed to fetch games", e)
             }
+            _loading.value = false
         }
     }
 }

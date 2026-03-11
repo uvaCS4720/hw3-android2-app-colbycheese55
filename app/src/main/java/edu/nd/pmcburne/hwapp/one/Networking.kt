@@ -9,9 +9,15 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit
 
 suspend fun fetchGames(date: LocalDate, gender: String): List<Game> {
-    val client = OkHttpClient()
+    val client = OkHttpClient().newBuilder()
+        .callTimeout(10, TimeUnit.SECONDS)
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .writeTimeout(10, TimeUnit.SECONDS)
+        .build()
 
     val genderStr = when (gender) {
         "Women" -> "basketball-women"
