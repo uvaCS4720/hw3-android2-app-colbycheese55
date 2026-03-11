@@ -60,7 +60,6 @@ class MainActivity : ComponentActivity() {
             HWStarterRepoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val vm = GameViewModel()
-                    vm.fetchApiData()
                     app(vm)
                 }
             }
@@ -110,7 +109,7 @@ fun gameCard(game: Game) {
 
             // Game Status Section
 
-            if (game.gameState == "future") {
+            if (game.gameState == GameState.FUTURE) {
                 val formatter = DateTimeFormatter.ofPattern("HH:mm")
                 val formattedTime = game.startTime.format(formatter)
 
@@ -123,8 +122,8 @@ fun gameCard(game: Game) {
             }
 
             else {
-                val timeRemainingFormatted = if (game.gameState != "FINAL")
-                    "${game.gameState} - ${game.timeLeft / 60}:${game.timeLeft % 60} left"
+                val timeRemainingFormatted = if (game.gameState != GameState.DONE)
+                    "${game.gameState.value} - ${game.timeLeft / 60}:${game.timeLeft % 60} left"
                     else "FINAL"
                 Text(
                     text = timeRemainingFormatted,
@@ -150,7 +149,7 @@ fun gameCard(game: Game) {
             }
 
             // Winner Section
-            if (game.gameState == "FINAL") {
+            if (game.gameState == GameState.DONE) {
                 val winner = if (game.homeScore > game.awayScore)
                     game.homeName else game.awayName
 
@@ -175,12 +174,14 @@ fun app(vm: GameViewModel) {
     val games by vm.entries.collectAsState()
     val loading by vm.loading.collectAsState()
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
     var dropdownExpanded by remember { mutableStateOf(false) }
+
+    vm.chooseGames(context)
+
 
     PullToRefreshBox(
         isRefreshing = loading,
-        onRefresh = { vm.fetchApiData() }
+        onRefresh = { vm.chooseGames(context) }
     ) {
         LazyColumn(
             modifier = Modifier.padding(16.dp)
@@ -206,6 +207,7 @@ fun app(vm: GameViewModel) {
                                     context,
                                     { _, year, month, day ->
                                         vm.setDate(LocalDate.of(year, month + 1, day))
+                                        vm.chooseGames(context)
                                     },
                                     today.year,
                                     today.monthValue - 1,
@@ -235,7 +237,10 @@ fun app(vm: GameViewModel) {
                             label = { Text("Gender") },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { dropdownExpanded = true },
+                                .clickable {
+                                    dropdownExpanded = true
+                                    vm.chooseGames(context)
+                                   },
                             trailingIcon = {
                                 Icon(Icons.Default.ArrowDropDown, "Select gender")
                             }
@@ -272,50 +277,50 @@ fun app(vm: GameViewModel) {
     }
 }
 
-@Preview
-@Composable
-fun prev1_gameCard() {
-    val game = Game(
-        homeName = "homies",
-        awayName = "awayies",
-        homeScore = 10,
-        awayScore = 15,
-        gameState = "4th quarter",
-        startTime = LocalTime.now(),
-        timeLeft = 100,
-    )
+//@Preview
+//@Composable
+//fun prev1_gameCard() {
+//    val game = Game(
+//        homeName = "homies",
+//        awayName = "awayies",
+//        homeScore = 10,
+//        awayScore = 15,
+//        gameState = "4th quarter",
+//        startTime = LocalTime.now(),
+//        timeLeft = 100,
+//    )
+//
+//    gameCard(game)
+//}
 
-    gameCard(game)
-}
-
-@Preview
-@Composable
-fun prev2_gameCard() {
-    val game = Game(
-        homeName = "homies",
-        awayName = "awayies",
-        homeScore = 0,
-        awayScore = 0,
-        gameState = "future",
-        startTime = LocalTime.now(),
-        timeLeft = 100,
-    )
-
-    gameCard(game)
-}
-
-@Preview
-@Composable
-fun prev3_gameCard() {
-    val game = Game(
-        homeName = "homies",
-        awayName = "awayies",
-        homeScore = 10,
-        awayScore = 15,
-        gameState = "finished",
-        startTime = LocalTime.now(),
-        timeLeft = 100,
-    )
-
-    gameCard(game)
-}
+//@Preview
+//@Composable
+//fun prev2_gameCard() {
+//    val game = Game(
+//        homeName = "homies",
+//        awayName = "awayies",
+//        homeScore = 0,
+//        awayScore = 0,
+//        gameState = "future",
+//        startTime = LocalTime.now(),
+//        timeLeft = 100,
+//    )
+//
+//    gameCard(game)
+//}
+//
+//@Preview
+//@Composable
+//fun prev3_gameCard() {
+//    val game = Game(
+//        homeName = "homies",
+//        awayName = "awayies",
+//        homeScore = 10,
+//        awayScore = 15,
+//        gameState = "finished",
+//        startTime = LocalTime.now(),
+//        timeLeft = 100,
+//    )
+//
+//    gameCard(game)
+//}

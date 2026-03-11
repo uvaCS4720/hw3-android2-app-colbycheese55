@@ -45,5 +45,5 @@ suspend fun fetchGames(date: LocalDate, gender: String): List<Game> {
 
     val json = Json { ignoreUnknownKeys = true }
     val processedResponse = json.decodeFromString<ApiResponse>(response)
-    return processedResponse.toGames()
+    return processedResponse.toGames(gender)
 }

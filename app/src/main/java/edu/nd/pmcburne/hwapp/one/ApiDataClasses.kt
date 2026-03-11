@@ -36,7 +36,7 @@ data class ApiNames(
     val short: String
 )
 
-fun ApiResponse.toGames(): List<Game> {
+fun ApiResponse.toGames(gender: String): List<Game> {
     val formatter = DateTimeFormatter.ofPattern("h:mm a", Locale.US)
 
     return games.map { g ->
@@ -46,12 +46,22 @@ fun ApiResponse.toGames(): List<Game> {
         val timeLeft = (timeParts.getOrNull(0)?.toIntOrNull() ?: 0) * 60 +
                 (timeParts.getOrNull(1)?.toIntOrNull() ?: 0)
 
+        val gameState = when(g.game.currentPeriod) {
+            "pre" -> GameState.FUTURE
+            "1st" -> if (gender == "Women") GameState.Q1 else GameState.H1
+            "2nd" -> if (gender == "Women") GameState.Q2 else GameState.H2
+            "3rd" -> GameState.Q3
+            "4th" -> GameState.Q4
+            "FINAL" -> GameState.DONE
+            else -> GameState.ERROR
+        }
+
         Game(
             homeName = g.game.home.names.short,
             awayName = g.game.away.names.short,
             homeScore = g.game.home.score.toIntOrNull() ?: 0,
             awayScore = g.game.away.score.toIntOrNull() ?: 0,
-            gameState = g.game.currentPeriod,
+            gameState = gameState,
             startTime = localTime,
             timeLeft = timeLeft
         )
